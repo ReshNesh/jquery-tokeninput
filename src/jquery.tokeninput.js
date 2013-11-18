@@ -29,6 +29,7 @@ var DEFAULT_SETTINGS = {
     noResultsText: "No results",
     searchingText: "Searching...",
     deleteText: "&times;",
+    createText: "Create: ",
     animateDropdown: true,
     placeholder: null,
     theme: null,
@@ -57,6 +58,7 @@ var DEFAULT_SETTINGS = {
     allowFreeTagging: false,
     allowTabOut: false,
     allowAutoSelect: true,
+    allowCreate: false,
 
     // Callbacks
     onResult: null,
@@ -846,7 +848,7 @@ $.TokenList = function (input, url_or_data, settings) {
 
     // Populate the results dropdown with some results
     function populate_dropdown (query, results) {
-        if(results && results.length) {
+        if((results && results.length) || $(input).data("settings").allowCreate) {
             dropdown.empty();
             var dropdown_ul = $("<ul>")
                 .appendTo(dropdown)
@@ -883,6 +885,28 @@ $.TokenList = function (input, url_or_data, settings) {
 
                 $.data(this_li.get(0), "tokeninput", value);
             });
+
+            if ($(input).data("settings").allowCreate) {
+                var result = {};
+                result[$(input).data("settings").propertyToSearch] = $(input).data("settings").createText + query;
+                var this_li = $(input).data("settings").resultsFormatter(result);
+
+                this_li = $(this_li).appendTo(dropdown_ul);
+
+                if(results.length % 2) {
+                    this_li.addClass($(input).data("settings").classes.dropdownItem);
+                } else {
+                    this_li.addClass($(input).data("settings").classes.dropdownItem2);
+                }
+
+                if(results.length === 0 && settings.allowAutoSelect) {
+                    select_dropdown_item(this_li);
+                }
+
+                result = {};
+                result[$(input).data("settings").propertyToSearch] = query;
+                $.data(this_li.get(0), "tokeninput", result);
+            }
 
             show_dropdown();
 

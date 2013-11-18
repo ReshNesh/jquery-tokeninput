@@ -866,6 +866,8 @@ $.TokenList = function (input, url_or_data, settings) {
                 results = results.slice(0, $(input).data("settings").resultsLimit);
             }
 
+            var exactMatch = false;
+            var queryUpperCase = query.toUpperCase();
             $.each(results, function(index, value) {
                 var this_li = $(input).data("settings").resultsFormatter(value);
 
@@ -884,9 +886,11 @@ $.TokenList = function (input, url_or_data, settings) {
                 }
 
                 $.data(this_li.get(0), "tokeninput", value);
+
+                exactMatch = exactMatch || value[$(input).data("settings").propertyToSearch].toUpperCase() === queryUpperCase;
             });
 
-            if ($(input).data("settings").allowCreate) {
+            if ($(input).data("settings").allowCreate && !exactMatch) {
                 var result = {};
                 result[$(input).data("settings").propertyToSearch] = $(input).data("settings").createText + query;
                 var this_li = $(input).data("settings").resultsFormatter(result);
